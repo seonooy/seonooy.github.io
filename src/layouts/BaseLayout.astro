@@ -1,0 +1,53 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: "kr" | "en";
+}
+
+const {
+  title,
+  description = "Seonoo Yoon portfolio and archive",
+  lang = "kr"
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+    <script is:inline>
+      const root = document.documentElement;
+      const storageKey = "theme";
+      const applyTheme = (theme) => {
+        root.dataset.theme = theme;
+      };
+      const savedTheme = localStorage.getItem(storageKey);
+      if (savedTheme) applyTheme(savedTheme);
+
+      document.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const button = target.closest("[data-theme-toggle]");
+        if (!button) return;
+        const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
+        applyTheme(nextTheme);
+        localStorage.setItem(storageKey, nextTheme);
+      });
+    </script>
+  </body>
+</html>

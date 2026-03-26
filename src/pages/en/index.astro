@@ -1,0 +1,24 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteShell from "../../components/SiteShell.astro";
+import HomeHero from "../../components/HomeHero.astro";
+import { siteContent } from "../../data/siteContent";
+
+const content = siteContent.en;
+---
+
+<BaseLayout
+  title={content.meta.title}
+  description={content.meta.description}
+  lang="en"
+>
+  <SiteShell
+    currentLang="en"
+    currentSection="me"
+    siteName="Achro"
+    navLabels={content.nav}
+    footerText={content.footer}
+  >
+    <HomeHero {...content.home} />
+  </SiteShell>
+</BaseLayout>

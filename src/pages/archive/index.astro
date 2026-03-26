@@ -1,0 +1,31 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteShell from "../../components/SiteShell.astro";
+import PostList from "../../components/PostList.astro";
+import { siteContent } from "../../data/siteContent";
+
+const posts = (await getCollection("posts", ({ data }) => data.lang === "kr" && !data.draft)).sort(
+  (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+);
+const content = siteContent.kr;
+---
+
+<BaseLayout
+  title="Achro | Archive"
+  description="공부 기록과 아카이브 포스트 목록"
+  lang="kr"
+>
+  <SiteShell
+    currentLang="kr"
+    currentSection="archive"
+    siteName="Achro"
+    navLabels={content.nav}
+    footerText={content.footer}
+  >
+    <section class="archive-hero">
+      <p class="section-kicker">ARCHIVE</p>
+    </section>
+    <PostList posts={posts} lang="kr" />
+  </SiteShell>
+</BaseLayout>

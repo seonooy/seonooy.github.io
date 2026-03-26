@@ -1,0 +1,159 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  posts: CollectionEntry<"posts">[];
+  lang: "kr" | "en";
+}
+
+const { posts, lang } = Astro.props;
+
+const dateFormatter = new Intl.DateTimeFormat(lang === "kr" ? "ko-KR" : "en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric"
+});
+
+const categories = ["CS", "Backend", "Infra"];
+const categoryTags = {
+  CS: ["os", "scheduling", "theory"],
+  Backend: ["spring", "java", "fastapi", "auth"],
+  Infra: ["docker", "network", "containers"]
+} as const;
+
+const getPostHref = (post: CollectionEntry<"posts">) => {
+  const slug = post.slug.split("/").slice(1).join("/");
+  return post.data.lang === "kr" ? `/archive/${slug}/` : `/en/archive/${slug}/`;
+};
+---
+
+<section class="archive-filter" aria-label="Categories">
+  {categories.map((category) => (
+    <button type="button" class="archive-filter__button" data-category-filter={category}>
+      {category}
+    </button>
+  ))}
+</section>
+
+<section class="archive-subfilter" aria-label="Subcategories">
+  {categories.map((category) => (
+    <div class="archive-subfilter__group" data-subfilter-group={category}>
+      <button type="button" class="archive-subfilter__button active" data-tag-filter="" data-parent-category={category}>
+        All
+      </button>
+      {categoryTags[category].map((tag) => (
+        <button
+          type="button"
+          class="archive-subfilter__button"
+          data-tag-filter={tag}
+          data-parent-category={category}
+        >
+          {tag}
+        </button>
+      ))}
+    </div>
+  ))}
+</section>
+
+<section class="post-list" data-post-list>
+  {posts.map((post) => (
+    <article
+      class="post-card"
+      data-category={post.data.category}
+      data-tags={post.data.tags.join(",")}
+    >
+      <div class="post-card__meta">
+        <span>{post.data.category}</span>
+        <span>{dateFormatter.format(post.data.publishedAt)}</span>
+      </div>
+      <h2>
+        <a href={getPostHref(post)}>{post.data.title}</a>
+      </h2>
+      <p>{post.data.description}</p>
+    </article>
+  ))}
+</section>
+
+<script is:inline>
+  const filterButtons = Array.from(document.querySelectorAll("[data-category-filter]"));
+  const subfilterGroups = Array.from(document.querySelectorAll("[data-subfilter-group]"));
+  const tagButtons = Array.from(document.querySelectorAll("[data-tag-filter]"));
+  const postCards = Array.from(document.querySelectorAll("[data-category]"));
+  const categories = new Set(["CS", "Backend", "Infra"]);
+  const params = new URLSearchParams(window.location.search);
+  let activeCategory = params.get("category") || "";
+  let activeTag = params.get("tag") || "";
+
+  if (!categories.has(activeCategory)) {
+    activeCategory = "";
+    activeTag = "";
+  }
+
+  const syncUrl = () => {
+    const nextParams = new URLSearchParams(window.location.search);
+
+    if (activeCategory) {
+      nextParams.set("category", activeCategory);
+    } else {
+      nextParams.delete("category");
+    }
+
+    if (activeCategory && activeTag) {
+      nextParams.set("tag", activeTag);
+    } else {
+      nextParams.delete("tag");
+    }
+
+    const nextQuery = nextParams.toString();
+    const nextUrl = nextQuery ? `${window.location.pathname}?${nextQuery}` : window.location.pathname;
+    window.history.replaceState({}, "", nextUrl);
+  };
+
+  const renderPosts = () => {
+    filterButtons.forEach((button) => {
+      const isActive = button.dataset.categoryFilter === activeCategory;
+      button.classList.toggle("active", isActive);
+    });
+
+    subfilterGroups.forEach((group) => {
+      const isVisible = group.dataset.subfilterGroup === activeCategory;
+      group.toggleAttribute("hidden", !isVisible);
+    });
+
+    tagButtons.forEach((button) => {
+      const matchesCategory = button.dataset.parentCategory === activeCategory;
+      const isActive = matchesCategory && (button.dataset.tagFilter || "") === activeTag;
+      button.classList.toggle("active", isActive);
+    });
+
+    postCards.forEach((card) => {
+      const categoryMatch = !activeCategory || card.dataset.category === activeCategory;
+      const tagList = (card.dataset.tags || "").split(",").filter(Boolean);
+      const tagMatch = !activeTag || tagList.includes(activeTag);
+      const shouldShow = categoryMatch && tagMatch;
+      card.toggleAttribute("hidden", !shouldShow);
+    });
+
+    syncUrl();
+  };
+
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextCategory = button.dataset.categoryFilter || "";
+      activeCategory = activeCategory === nextCategory ? "" : nextCategory;
+      activeTag = "";
+      renderPosts();
+    });
+  });
+
+  tagButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const parentCategory = button.dataset.parentCategory || "";
+      if (parentCategory !== activeCategory) return;
+      activeTag = button.dataset.tagFilter || "";
+      renderPosts();
+    });
+  });
+
+  renderPosts();
+</script>

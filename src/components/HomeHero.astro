@@ -1,0 +1,35 @@
+---
+interface LinkItem {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  name: string;
+  role: string;
+  headline: string;
+  intro: string;
+  paragraphs: string[];
+  links: LinkItem[];
+}
+
+const { name, role, headline, intro, paragraphs, links } = Astro.props;
+---
+
+<section class="hero-block">
+  <h1>{name}</h1>
+  <p class="hero-role">{role}</p>
+  <p class="hero-headline">{headline}</p>
+  <p class="hero-intro">{intro}</p>
+  <div class="hero-links">
+    {links.map((link) => (
+      <a href={link.href} target={link.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer">
+        {link.label}
+      </a>
+    ))}
+  </div>
+</section>
+
+<section class="home-copy">
+  {paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+</section>

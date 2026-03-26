@@ -1,0 +1,31 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import SiteShell from "../../../components/SiteShell.astro";
+import PostList from "../../../components/PostList.astro";
+import { siteContent } from "../../../data/siteContent";
+
+const posts = (await getCollection("posts", ({ data }) => data.lang === "en" && !data.draft)).sort(
+  (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+);
+const content = siteContent.en;
+---
+
+<BaseLayout
+  title="Achro | Archive"
+  description="Archive page for study notes and project writing"
+  lang="en"
+>
+  <SiteShell
+    currentLang="en"
+    currentSection="archive"
+    siteName="Achro"
+    navLabels={content.nav}
+    footerText={content.footer}
+  >
+    <section class="archive-hero">
+      <p class="section-kicker">ARCHIVE</p>
+    </section>
+    <PostList posts={posts} lang="en" />
+  </SiteShell>
+</BaseLayout>

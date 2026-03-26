@@ -1,0 +1,77 @@
+---
+interface Props {
+  currentLang: "kr" | "en";
+  currentSection: "me" | "archive";
+  siteName?: string;
+  navLabels?: {
+    me: string;
+    archive: string;
+    langEn: string;
+    langKr: string;
+  };
+  footerText?: string;
+}
+
+const {
+  currentLang,
+  currentSection,
+  siteName = "ACHRO",
+  navLabels = {
+    me: "ME",
+    archive: "ARCHIVE",
+    langEn: "EN",
+    langKr: "KOR"
+  },
+  footerText = "© 2026 Achro. All rights reserved."
+} = Astro.props;
+
+const langSwitch =
+  currentSection === "me"
+    ? {
+        kr: "/",
+        en: "/en/"
+      }
+    : {
+        kr: "/archive/",
+        en: "/en/archive/"
+      };
+---
+
+<div class="page-shell">
+  <header class="site-header">
+    <a class="site-title" href={currentLang === "kr" ? "/" : "/en/"}>{siteName}</a>
+    <nav class="main-nav" aria-label="Main">
+      <a
+        href={currentLang === "kr" ? "/" : "/en/"}
+        class={currentSection === "me" ? "active" : undefined}
+      >
+        {navLabels.me}
+      </a>
+      <span class="nav-divider" aria-hidden="true">|</span>
+      <a
+        href={currentLang === "kr" ? "/archive/" : "/en/archive/"}
+        class={currentSection === "archive" ? "active" : undefined}
+      >
+        {navLabels.archive}
+      </a>
+    </nav>
+    <div class="toolbar">
+      <div class="lang-switch" aria-label="Language">
+        <a href={langSwitch.en} class={currentLang === "en" ? "active" : undefined}>{navLabels.langEn}</a>
+        <span class="nav-divider" aria-hidden="true">|</span>
+        <a href={langSwitch.kr} class={currentLang === "kr" ? "active" : undefined}>{navLabels.langKr}</a>
+      </div>
+      <span class="nav-divider" aria-hidden="true">|</span>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+        <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">◐</span>
+        <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">◑</span>
+      </button>
+    </div>
+  </header>
+  <main>
+    <slot />
+  </main>
+  <footer class="site-footer">
+    <p>{footerText}</p>
+  </footer>
+</div>

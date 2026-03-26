@@ -1,0 +1,52 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteShell from "../components/SiteShell.astro";
+import { siteContent } from "../data/siteContent";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts", ({ data }) => !data.draft);
+
+  return posts.map((post) => ({
+    params: {
+      slug:
+        post.data.lang === "kr"
+          ? `archive/${post.slug.split("/").slice(1).join("/")}`
+          : `en/archive/${post.slug.split("/").slice(1).join("/")}`
+    },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const currentLang = post.data.lang;
+const content = siteContent[currentLang];
+const dateFormatter = new Intl.DateTimeFormat(currentLang === "kr" ? "ko-KR" : "en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric"
+});
+---
+
+<BaseLayout title={`${post.data.title} | Seonoo Yoon`} description={post.data.description} lang={currentLang}>
+  <SiteShell
+    currentLang={currentLang}
+    currentSection="archive"
+    siteName="Achro"
+    navLabels={content.nav}
+    footerText={content.footer}
+  >
+    <article class="post-detail">
+      <div class="post-detail__meta">
+        <span>{post.data.category}</span>
+        <span>{dateFormatter.format(post.data.publishedAt)}</span>
+      </div>
+      <h1>{post.data.title}</h1>
+      <p class="post-detail__description">{post.data.description}</p>
+      <div class="post-body">
+        <Content />
+      </div>
+    </article>
+  </SiteShell>
+</BaseLayout>
