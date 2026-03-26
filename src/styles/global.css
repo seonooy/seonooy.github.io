@@ -139,8 +139,7 @@ main {
 }
 
 .hero-block {
-  padding: 4px 0 84px;
-  border-bottom: 1px solid var(--border);
+  padding: 36px 0 0;
   text-align: center;
 }
 
@@ -156,7 +155,6 @@ main {
 }
 
 .hero-role,
-.hero-headline,
 .hero-intro,
 .content-block p,
 .section-intro p,
@@ -169,17 +167,9 @@ main {
 }
 
 .hero-role {
-  margin: 14px 0 0;
+  margin: 16px 0 0;
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--text);
-}
-
-.hero-headline {
-  max-width: 760px;
-  margin: 24px auto 0;
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
-  line-height: 1.35;
   color: var(--text);
 }
 
@@ -193,7 +183,7 @@ main {
   display: flex;
   justify-content: center;
   gap: 14px;
-  margin-top: 28px;
+  margin-top: 30px;
 }
 
 .hero-links a {
@@ -204,15 +194,16 @@ main {
   text-decoration: none;
 }
 
-.home-copy,
 .section-intro,
 .archive-hero,
 .post-detail {
   padding: 44px 0;
-  border-bottom: 1px solid var(--border);
+}
+.section-intro,
+.archive-hero {
+  border-bottom: 0;
 }
 
-.home-copy p,
 .section-intro p,
 .archive-hero p {
   max-width: 740px;
@@ -432,7 +423,6 @@ main {
     font-size: clamp(2.5rem, 12vw, 4rem);
   }
 
-  .home-copy p,
   .section-intro p,
   .archive-hero p {
     text-align: left;
